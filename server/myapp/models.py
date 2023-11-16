@@ -81,6 +81,137 @@ class Thing(models.Model):
     collect_count = models.IntegerField(default=0)
 
     class Meta:
-            db_table = "b_thing"
+        db_table = "b_thing"
 
 
+class Comment(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    content = models.CharField(max_length=200, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_comment')
+    thing = models.ForeignKey(Thing, on_delete=models.CASCADE, null=True, related_name='thing_comment')
+    comment_time = models.DateTimeField(auto_now_add=True, null=True)
+    like_count = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = "b_comment"
+
+
+class Record(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_record')
+    thing = models.ForeignKey(Thing, on_delete=models.CASCADE, null=True, related_name='thing_record')
+    title = models.CharField(max_length=100, blank=True, null=True)
+    classification = models.ForeignKey(Classification, on_delete=models.CASCADE, null=True,
+                                       related_name='classification')
+    record_time = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        db_table = "b_record"
+
+
+class LoginLog(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    username = models.CharField(max_length=50, blank=True, null=True)
+    ip = models.CharField(max_length=100, blank=True, null=True)
+    ua = models.CharField(max_length=200, blank=True, null=True)
+    log_time = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        db_table = "b_login_log"
+
+
+class OpLog(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    re_ip = models.CharField(max_length=100, blank=True, null=True)
+    re_time = models.DateTimeField(auto_now_add=True, null=True)
+    re_url = models.CharField(max_length=200, blank=True, null=True)
+    re_method = models.CharField(max_length=10, blank=True, null=True)
+    re_content = models.CharField(max_length=200, blank=True, null=True)
+    access_time = models.CharField(max_length=10, blank=True, null=True)
+
+    class Meta:
+        db_table = "b_op_log"
+
+
+class ErrorLog(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    ip = models.CharField(max_length=100, blank=True, null=True)
+    url = models.CharField(max_length=200, blank=True, null=True)
+    method = models.CharField(max_length=10, blank=True, null=True)
+    content = models.CharField(max_length=200, blank=True, null=True)
+    log_time = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        db_table = "b_error_log"
+
+
+class Order(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    order_number = models.CharField(max_length=13, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_order')
+    gwc = models.CharField(max_length=512, blank=True, null=True)
+    amount = models.CharField(max_length=10, blank=True, null=True)
+    status = models.CharField(max_length=2, blank=True, null=True)  # 1未支付 2已支付 7订单取消
+    order_time = models.DateTimeField(auto_now_add=True, null=True)
+    pay_time = models.DateTimeField(null=True)
+    receiver_name = models.CharField(max_length=20, blank=True, null=True)
+    receiver_address = models.CharField(max_length=50, blank=True, null=True)
+    receiver_phone = models.CharField(max_length=20, blank=True, null=True)
+    remark = models.CharField(max_length=30, blank=True, null=True)
+
+    class Meta:
+        db_table = "b_order"
+
+
+class OrderLog(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_order_log')
+    thing = models.ForeignKey(Thing, on_delete=models.CASCADE, null=True, related_name='thing_order_log')
+    action = models.CharField(max_length=2, blank=True, null=True)
+    log_time = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        db_table = "b_order_log"
+
+
+class Banner(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    image = models.ImageField(upload_to='banner/', null=True)
+    thing = models.ForeignKey(Thing, on_delete=models.CASCADE, null=True, related_name='thing_banner')
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        db_table = "b_banner"
+
+
+class Ad(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    image = models.ImageField(upload_to='ad/', null=True)
+    link = models.CharField(max_length=500, blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        db_table = "b_ad"
+
+
+class Notice(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    title = models.CharField(max_length=100, blank=True, null=True)
+    content = models.CharField(max_length=1000, blank=True, null=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        db_table = "b_notice"
+
+
+class Address(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='user_address')
+    name = models.CharField(max_length=100, blank=True, null=True)
+    mobile = models.CharField(max_length=30, blank=True, null=True)
+    desc = models.CharField(max_length=300, blank=True, null=True)
+    default = models.BooleanField(blank=True, null=True, default=False)  # 是否默认地址
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
+
+    class Meta:
+        db_table = "b_address"
